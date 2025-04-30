@@ -18,6 +18,7 @@ public class advancedcalc1 extends JFrame {
     private static final MathContext PRECISION = new MathContext(20);
     private static final int BUTTON_SIZE = 60;
     private static final int ICON_SIZE = 40;
+    private static final BigDecimal PI = new BigDecimal("3.14159265358979323846");
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -32,9 +33,9 @@ public class advancedcalc1 extends JFrame {
     }
 
     public advancedcalc1() {
-        setTitle("KZJ-CYBERSPACE");
+        setTitle("KZJ-CYBERSPACE SCIENTIFIC");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(400, 500));
+        setMinimumSize(new Dimension(500, 600));
         
         JPanel contentPane = new JPanel(new BorderLayout(10, 10));
         contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -53,59 +54,62 @@ public class advancedcalc1 extends JFrame {
         ));
         contentPane.add(displayScreen, BorderLayout.NORTH);
 
-        // Button panel
+        // Main button panel
+        JPanel mainButtonPanel = new JPanel(new BorderLayout(5, 5));
+        mainButtonPanel.setOpaque(false);
+
+        // Scientific functions panel (left side)
+        JPanel scientificPanel = new JPanel(new GridLayout(5, 2, 5, 5));
+        scientificPanel.setOpaque(false);
+        
+        // Scientific buttons
+        scientificPanel.add(createButton("√", new Color(180, 230, 180), e -> handleSquareRoot()));
+        scientificPanel.add(createButton("∛", new Color(180, 230, 180), e -> handleCubeRoot()));
+        scientificPanel.add(createButton("x²", new Color(180, 230, 180), e -> handleSquare()));
+        scientificPanel.add(createButton("x³", new Color(180, 230, 180), e -> handleCube()));
+        scientificPanel.add(createButton("π", new Color(180, 230, 230), e -> handlePi()));
+        scientificPanel.add(createButton("log", new Color(180, 230, 230), e -> handleLog()));
+        scientificPanel.add(createButton("cos", new Color(180, 230, 230), e -> handleCos()));
+        scientificPanel.add(createButton("tan", new Color(180, 230, 230), e -> handleTan()));
+        scientificPanel.add(createButton("(", new Color(200, 200, 255), e -> appendToExpression("(")));
+        scientificPanel.add(createButton(")", new Color(200, 200, 255), e -> appendToExpression(")")));
+
+        mainButtonPanel.add(scientificPanel, BorderLayout.WEST);
+
+        // Standard calculator panel
         JPanel buttonPanel = new JPanel(new GridLayout(5, 4, 5, 5));
         buttonPanel.setOpaque(false);
         
         // First row
-        buttonPanel.add(createButton("", loadAndScaleIcon("/ROOFTOP/ac.jpg", ICON_SIZE, ICON_SIZE), 
-            new Color(255, 100, 100), e -> handleAC()));
-        buttonPanel.add(createButton("", loadAndScaleIcon("/ROOFTOP/mode.png", ICON_SIZE, ICON_SIZE), 
-            new Color(100, 200, 255), e -> handleMode()));
-        buttonPanel.add(createButton("", loadAndScaleIcon("/ROOFTOP/delete.png", ICON_SIZE, ICON_SIZE), 
-            new Color(255, 150, 50), e -> handleDelete()));
-        buttonPanel.add(createButton("/", loadAndScaleIcon("/ROOFTOP/divide.png", ICON_SIZE, ICON_SIZE), 
-            new Color(72, 61, 139), e -> appendOperator("/")));
+        buttonPanel.add(createButton("AC", new Color(255, 100, 100), e -> handleAC()));
+        buttonPanel.add(createButton("Mode", new Color(100, 200, 255), e -> handleMode()));
+        buttonPanel.add(createButton("Del", new Color(255, 150, 50), e -> handleDelete()));
+        buttonPanel.add(createButton("/", new Color(72, 61, 139), e -> appendOperator("/")));
 
         // Number rows
-        buttonPanel.add(createButton("7", loadAndScaleIcon("/ROOFTOP/seven.png", ICON_SIZE, ICON_SIZE), 
-            new Color(220, 220, 220), e -> appendToExpression("7")));
-        buttonPanel.add(createButton("8", loadAndScaleIcon("/ROOFTOP/eight.png", ICON_SIZE, ICON_SIZE), 
-            new Color(220, 220, 220), e -> appendToExpression("8")));
-        buttonPanel.add(createButton("9", loadAndScaleIcon("/ROOFTOP/nine.png", ICON_SIZE, ICON_SIZE), 
-            new Color(220, 220, 220), e -> appendToExpression("9")));
-        buttonPanel.add(createButton("", loadAndScaleIcon("/ROOFTOP/multi.jpg", ICON_SIZE, ICON_SIZE), 
-            new Color(72, 61, 139), e -> appendOperator("*")));
+        buttonPanel.add(createButton("7", new Color(220, 220, 220), e -> appendToExpression("7")));
+        buttonPanel.add(createButton("8", new Color(220, 220, 220), e -> appendToExpression("8")));
+        buttonPanel.add(createButton("9", new Color(220, 220, 220), e -> appendToExpression("9")));
+        buttonPanel.add(createButton("*", new Color(72, 61, 139), e -> appendOperator("*")));
 
-        buttonPanel.add(createButton("4", loadAndScaleIcon("/ROOFTOP/four.png", ICON_SIZE, ICON_SIZE), 
-            new Color(220, 220, 220), e -> appendToExpression("4")));
-        buttonPanel.add(createButton("5", loadAndScaleIcon("/ROOFTOP/five.png", ICON_SIZE, ICON_SIZE), 
-            new Color(220, 220, 220), e -> appendToExpression("5")));
-        buttonPanel.add(createButton("6", loadAndScaleIcon("/ROOFTOP/six.png", ICON_SIZE, ICON_SIZE), 
-            new Color(220, 220, 220), e -> appendToExpression("6")));
-        buttonPanel.add(createButton("", loadAndScaleIcon("/ROOFTOP/minus.png", ICON_SIZE, ICON_SIZE), 
-            new Color(72, 61, 139), e -> appendOperator("-")));
+        buttonPanel.add(createButton("4", new Color(220, 220, 220), e -> appendToExpression("4")));
+        buttonPanel.add(createButton("5", new Color(220, 220, 220), e -> appendToExpression("5")));
+        buttonPanel.add(createButton("6", new Color(220, 220, 220), e -> appendToExpression("6")));
+        buttonPanel.add(createButton("-", new Color(72, 61, 139), e -> appendOperator("-")));
 
-        buttonPanel.add(createButton("1", loadAndScaleIcon("/ROOFTOP/one.png", ICON_SIZE, ICON_SIZE), 
-            new Color(220, 220, 220), e -> appendToExpression("1")));
-        buttonPanel.add(createButton("2", loadAndScaleIcon("/ROOFTOP/two.png", ICON_SIZE, ICON_SIZE), 
-            new Color(220, 220, 220), e -> appendToExpression("2")));
-        buttonPanel.add(createButton("3", loadAndScaleIcon("/ROOFTOP/three.png", ICON_SIZE, ICON_SIZE), 
-            new Color(220, 220, 220), e -> appendToExpression("3")));
-        buttonPanel.add(createButton("", loadAndScaleIcon("/ROOFTOP/plus.jpg", ICON_SIZE, ICON_SIZE), 
-            new Color(72, 61, 139), e -> appendOperator("+")));
+        buttonPanel.add(createButton("1", new Color(220, 220, 220), e -> appendToExpression("1")));
+        buttonPanel.add(createButton("2", new Color(220, 220, 220), e -> appendToExpression("2")));
+        buttonPanel.add(createButton("3", new Color(220, 220, 220), e -> appendToExpression("3")));
+        buttonPanel.add(createButton("+", new Color(72, 61, 139), e -> appendOperator("+")));
 
         // Last row
-        buttonPanel.add(createButton("0", loadAndScaleIcon("/ROOFTOP/zero.png", ICON_SIZE, ICON_SIZE), 
-            new Color(220, 220, 220), e -> appendToExpression("0")));
-        buttonPanel.add(createButton(".", null, 
-            new Color(220, 220, 220), e -> handleDecimal()));
-        buttonPanel.add(createButton("", loadAndScaleIcon("/ROOFTOP/clear.png", ICON_SIZE, ICON_SIZE), 
-            new Color(255, 150, 50), e -> handleClear()));
-        buttonPanel.add(createButton("", loadAndScaleIcon("/ROOFTOP/equals.png", ICON_SIZE, ICON_SIZE), 
-            new Color(50, 150, 50), e -> evaluateAndDisplay()));
+        buttonPanel.add(createButton("0", new Color(220, 220, 220), e -> appendToExpression("0")));
+        buttonPanel.add(createButton(".", new Color(220, 220, 220), e -> handleDecimal()));
+        buttonPanel.add(createButton("Clr", new Color(255, 150, 50), e -> handleClear()));
+        buttonPanel.add(createButton("=", new Color(50, 150, 50), e -> evaluateAndDisplay()));
 
-        contentPane.add(buttonPanel, BorderLayout.CENTER);
+        mainButtonPanel.add(buttonPanel, BorderLayout.CENTER);
+        contentPane.add(mainButtonPanel, BorderLayout.CENTER);
 
         // Keyboard support
         displayScreen.addKeyListener(new KeyAdapter() {
@@ -115,19 +119,11 @@ public class advancedcalc1 extends JFrame {
             }
         });
 
-        // Make window resizable
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                updateFontSizes();
-            }
-        });
-
         pack();
     }
 
-    private JButton createButton(String text, ImageIcon icon, Color bgColor, ActionListener action) {
-        JButton button = new JButton(text, icon);
+    private JButton createButton(String text, Color bgColor, ActionListener action) {
+        JButton button = new JButton(text);
         button.setPreferredSize(new Dimension(BUTTON_SIZE, BUTTON_SIZE));
         button.setBackground(bgColor);
         button.setForeground(Color.BLACK);
@@ -138,7 +134,6 @@ public class advancedcalc1 extends JFrame {
         button.setVerticalTextPosition(SwingConstants.CENTER);
         button.addActionListener(action);
         
-        // Hover effect
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -161,26 +156,158 @@ public class advancedcalc1 extends JFrame {
         return new Color(r, g, b);
     }
 
-    private void updateFontSizes() {
-        int fontSize = Math.max(12, Math.min(24, getWidth() / 20));
-        displayScreen.setFont(new Font("Segoe UI", Font.PLAIN, fontSize));
-    }
+    private void handleKeyPress(KeyEvent e) {
+        if (isReadOnly) return;
 
-    private ImageIcon loadAndScaleIcon(String path, int width, int height) {
-        try {
-            ImageIcon originalIcon = new ImageIcon(getClass().getResource(path));
-            if (originalIcon.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
-                Image scaledImage = originalIcon.getImage().getScaledInstance(
-                    width, height, Image.SCALE_SMOOTH);
-                return new ImageIcon(scaledImage);
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading image: " + path);
+        char keyChar = e.getKeyChar();
+        int keyCode = e.getKeyCode();
+
+        if (keyChar >= '0' && keyChar <= '9') {
+            appendToExpression(String.valueOf(keyChar));
         }
-        return null;
+        else if (keyChar == '+' || keyChar == '-' || keyChar == '*' || keyChar == '/') {
+            appendOperator(String.valueOf(keyChar));
+        }
+        else if (keyChar == '.') {
+            handleDecimal();
+        }
+        else if (keyChar == '=' || keyCode == KeyEvent.VK_ENTER) {
+            evaluateAndDisplay();
+        }
+        else if (keyCode == KeyEvent.VK_BACK_SPACE) {
+            handleDelete();
+        }
+        else if (keyCode == KeyEvent.VK_ESCAPE) {
+            handleClear();
+        }
+        else if (keyChar == 's' || keyChar == 'S') {
+            handleSquareRoot();
+        }
+        else if (keyChar == 'c' || keyChar == 'C') {
+            handleCubeRoot();
+        }
+        else if (keyChar == 'p' || keyChar == 'P') {
+            handlePi();
+        }
+        else if (keyChar == 'l' || keyChar == 'L') {
+            handleLog();
+        }
     }
 
-    // Button handlers
+    // Scientific functions
+    private void handleSquareRoot() {
+        try {
+            BigDecimal value = currentExpression.isEmpty() ? BigDecimal.ZERO : new BigDecimal(currentExpression);
+            if (value.compareTo(BigDecimal.ZERO) < 0) {
+                displayScreen.setText("Error: Negative sqrt");
+                return;
+            }
+            BigDecimal result = BigDecimal.valueOf(Math.sqrt(value.doubleValue()));
+            currentExpression = result.stripTrailingZeros().toPlainString();
+            displayScreen.setText(currentExpression);
+            newInputExpected = true;
+        } catch (Exception e) {
+            displayScreen.setText("Error: " + e.getMessage());
+            currentExpression = "";
+            newInputExpected = true;
+        }
+    }
+
+    private void handleCubeRoot() {
+        try {
+            BigDecimal value = currentExpression.isEmpty() ? BigDecimal.ZERO : new BigDecimal(currentExpression);
+            BigDecimal result = BigDecimal.valueOf(Math.cbrt(value.doubleValue()));
+            currentExpression = result.stripTrailingZeros().toPlainString();
+            displayScreen.setText(currentExpression);
+            newInputExpected = true;
+        } catch (Exception e) {
+            displayScreen.setText("Error: " + e.getMessage());
+            currentExpression = "";
+            newInputExpected = true;
+        }
+    }
+
+    private void handleSquare() {
+        try {
+            BigDecimal value = currentExpression.isEmpty() ? BigDecimal.ZERO : new BigDecimal(currentExpression);
+            BigDecimal result = value.pow(2, PRECISION);
+            currentExpression = result.stripTrailingZeros().toPlainString();
+            displayScreen.setText(currentExpression);
+            newInputExpected = true;
+        } catch (Exception e) {
+            displayScreen.setText("Error: " + e.getMessage());
+            currentExpression = "";
+            newInputExpected = true;
+        }
+    }
+
+    private void handleCube() {
+        try {
+            BigDecimal value = currentExpression.isEmpty() ? BigDecimal.ZERO : new BigDecimal(currentExpression);
+            BigDecimal result = value.pow(3, PRECISION);
+            currentExpression = result.stripTrailingZeros().toPlainString();
+            displayScreen.setText(currentExpression);
+            newInputExpected = true;
+        } catch (Exception e) {
+            displayScreen.setText("Error: " + e.getMessage());
+            currentExpression = "";
+            newInputExpected = true;
+        }
+    }
+
+    private void handlePi() {
+        currentExpression = PI.toPlainString();
+        displayScreen.setText(currentExpression);
+        newInputExpected = true;
+    }
+
+    private void handleLog() {
+        try {
+            BigDecimal value = currentExpression.isEmpty() ? BigDecimal.ZERO : new BigDecimal(currentExpression);
+            if (value.compareTo(BigDecimal.ZERO) <= 0) {
+                displayScreen.setText("Error: Log <= 0");
+                return;
+            }
+            BigDecimal result = BigDecimal.valueOf(Math.log10(value.doubleValue()));
+            currentExpression = result.stripTrailingZeros().toPlainString();
+            displayScreen.setText(currentExpression);
+            newInputExpected = true;
+        } catch (Exception e) {
+            displayScreen.setText("Error: " + e.getMessage());
+            currentExpression = "";
+            newInputExpected = true;
+        }
+    }
+
+    private void handleCos() {
+        try {
+            BigDecimal value = currentExpression.isEmpty() ? BigDecimal.ZERO : new BigDecimal(currentExpression);
+            BigDecimal result = BigDecimal.valueOf(Math.cos(value.doubleValue()));
+            currentExpression = result.stripTrailingZeros().toPlainString();
+            displayScreen.setText(currentExpression);
+            newInputExpected = true;
+        } catch (Exception e) {
+            displayScreen.setText("Error: " + e.getMessage());
+            currentExpression = "";
+            newInputExpected = true;
+        }
+    }
+
+    private void handleTan() {
+        try {
+            BigDecimal value = currentExpression.isEmpty() ? BigDecimal.ZERO : new BigDecimal(currentExpression);
+            BigDecimal result = BigDecimal.valueOf(Math.tan(value.doubleValue()));
+            currentExpression = result.stripTrailingZeros().toPlainString();
+            displayScreen.setText(currentExpression);
+            newInputExpected = true;
+        } catch (Exception e) {
+            displayScreen.setText("Error: " + e.getMessage());
+            currentExpression = "";
+            newInputExpected = true;
+        }
+    }
+
+    // Basic calculator functions
     private void handleAC() {
         isReadOnly = true;
         displayScreen.setEditable(false);
@@ -218,32 +345,6 @@ public class advancedcalc1 extends JFrame {
             if (parts.length == 0 || !parts[parts.length - 1].contains(".")) {
                 appendToExpression(".");
             }
-        }
-    }
-
-    private void handleKeyPress(KeyEvent e) {
-        if (isReadOnly) return;
-
-        char keyChar = e.getKeyChar();
-        int keyCode = e.getKeyCode();
-
-        if (keyChar >= '0' && keyChar <= '9') {
-            appendToExpression(String.valueOf(keyChar));
-        }
-        else if (keyChar == '+' || keyChar == '-' || keyChar == '*' || keyChar == '/') {
-            appendOperator(String.valueOf(keyChar));
-        }
-        else if (keyChar == '.') {
-            handleDecimal();
-        }
-        else if (keyChar == '=' || keyCode == KeyEvent.VK_ENTER) {
-            evaluateAndDisplay();
-        }
-        else if (keyCode == KeyEvent.VK_BACK_SPACE) {
-            handleDelete();
-        }
-        else if (keyCode == KeyEvent.VK_ESCAPE) {
-            handleClear();
         }
     }
 
